@@ -22,9 +22,11 @@ else:
     from urllib import request
     pv = "python3"
 
-ACCESS_KEY_ID = 'access_key_id'
-ACCESS_KEY_SECRET = 'access_key_secret'
-
+# Aliyun AccessKey. https://help.aliyun.com/knowledge_detail/38738.html#h2--ram-ram-accesskey-id-accesskey-secret-2
+ACCESS_KEY_ID = 'LTAIDQTp1b6XWiUR'
+ACCESS_KEY_SECRET = 'Ph4QCD1YdN4J8ZdU5w0gpqC9CCfl5W'
+#ACCESS_KEY_ID = 'access_key_id'
+#ACCESS_KEY_SECRET = 'access_key_secret'
 
 class AliDns:
     def __init__(self, access_key_id, access_key_secret, domain_name):
@@ -183,10 +185,17 @@ if __name__ == '__main__':
 
     domain = AliDns(ACCESS_KEY_ID, ACCESS_KEY_SECRET, certbot_domain)
     data = domain.describe_domain_records()
+    if ("DomainRecords" not in data.keys()) and ("Code" and "Message" in data.keys()):
+        print(data["Code"], data["Message"])
+        print("No access! Please check your AccessKey is correct.")
+        exit()
+
     record_list = data["DomainRecords"]["Record"]
+    print(record_list)
     if record_list:
         for item in record_list:
             if acme_challenge == item['RR']:
+                #print("ggg", item['Value'])
                 domain.delete_domain_record(item['RecordId'])
 
     domain.add_domain_record("TXT", acme_challenge, certbot_validation)
